@@ -17,3 +17,11 @@ class CircleShape(pygame.sprite.Sprite):
 
     def update(self, dt):
         pass
+
+    # Returns true if two circles collide. Otherwise returns false
+    def collide_check(self, circle2):
+        distance = self.position.distance_to(circle2.position)
+
+        if distance <= (self.radius + circle2.radius):
+            return True
+        return False
