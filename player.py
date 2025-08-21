@@ -7,6 +7,7 @@ class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
+        self.shot_cooldown_timer = 0
         # Below attribute only intended for troubleshooting. Exists in the "update(dt)" and "shoot()" methods.
         # self.troubleshoot_slowdown = 0
     
@@ -42,17 +43,19 @@ class Player(CircleShape):
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
+        
+        if self.shot_cooldown_timer > 0:
+            self.shot_cooldown_timer -= dt
     
     def move(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         self.position += forward * PLAYER_SPEED * dt
     
     def shoot(self):
-        bullet = Shot(self.position.x, self.position.y)
-        # Below does not work because rotate() returns a vector, but does not modify it.
-        # bullet.velocity = pygame.Vector2(0, 1)
-        # bullet.velocity.rotate(self.rotation)
-        bullet.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+        if self.shot_cooldown_timer <= 0:
+            bullet = Shot(self.position.x, self.position.y)
+            bullet.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+            self.shot_cooldown_timer = PLAYER_SHOOT_COOLDOWN
 
         # self.troubleshoot_slowdown += 1
         # if  self.troubleshoot_slowdown >= 120:
